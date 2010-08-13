@@ -395,7 +395,6 @@ User.prototype.changeNick = function (newNick)
 	{
 		var packet = "NICK :" + newNick;
 	
-		this.sendMessage(packet, this);
 		this.broadcast(packet, this);
 	
 		delete users[this.nick];

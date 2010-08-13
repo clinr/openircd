@@ -11,8 +11,8 @@ exports.listen = {
 };
 
 exports.server = {
-	name: "main.openbrasil.org",
-	description: "openbrasil main server",
+	name: "experimental.openbrasil.org",
+	description: "servidor experimental openbrasil",
 };
 
 exports.network = {

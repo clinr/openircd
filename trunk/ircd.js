@@ -398,23 +398,23 @@ User.prototype.changeNick = function (newNick)
 		this.sendMessage(packet, this);
 		this.broadcast(packet, this);
 	
-		users[this.nick] = undefined;
+		delete users[this.nick];
 		users[newNick] = this;
 		this.nick = newNick;
-	
+
 	} else 
 	{
 		users[newNick] = this;
 		this.nick = newNick;
 	}
-	
+
 	this.maybeRegister();
 };
 
 User.prototype.privmsg = function (target, msg, type) 
 {
 	this.last_msg_time = unix_timestamp();
-	
+
 	if (type == undefined) {
 		type = "PRIVMSG";
 	}

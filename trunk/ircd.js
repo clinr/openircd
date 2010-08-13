@@ -22,7 +22,8 @@ created_time = null;
 var net = require("net"),
 	sys = require("sys"),
 	config = require("./config"),
-	replies = require("./src/replies");
+	replies = require("./src/replies"),
+	motd	= require("./src/motd");
 
 puts = sys.puts;
 inspect = sys.inspect;
@@ -320,6 +321,20 @@ User.prototype.sendPing = function ()
 	debug("ping sent to: " + this.nick);
 };
 
+User.prototype.sendMotd = function () 
+{
+	if (motd.lst.length > 0) 
+	{
+		this.sendMessage(replies.get("RPL_MOTDSTART", this.nick, config.server.name));
+		
+		for (var i in motd.lst) {
+			this.sendMessage(replies.get("RPL_MOTD", this.nick, motd.lst[i]));
+		}
+		
+		this.sendMessage(replies.get("RPL_ENDOFMOTD", this.nick));
+	}
+}
+
 User.prototype.maybeRegister = function () 
 {
 	if (this.nick && this.names && !this.registered) 
@@ -341,6 +356,8 @@ User.prototype.maybeRegister = function ()
 		}, config.general.ping_frequency * 60 * 1000, this);
 		
 		this.registered = true;	
+		
+		this.sendMotd();
 	}
 }
 
@@ -564,6 +581,10 @@ User.prototype.parse = function (message)
 			
 			break;
 		  
+		case "MOTD":
+			this.sendMotd();
+			break;
+			
 		case "WHO":
 			var args = rest.split(/\s/);
 			var channelName = normalizeChannelName(args[0]);
@@ -582,12 +603,12 @@ User.prototype.parse = function (message)
 			var target = users[nickname];
 			var c = Array();
 			
-			for (var i in target.channels) {
-				c.push(target.channels[i].name);
-			}
-			
 			if (target) 
 			{
+				for (var i in target.channels) {
+					c.push(target.channels[i].name);
+				}
+			
 				this.sendMessage(replies.get("RPL_WHOISUSER", this.nick, target.nick, 
 					target.names.user, target.vhost, target.names.real));
 					
@@ -647,6 +668,7 @@ User.prototype.parse = function (message)
 			break;
 			
 			
+		case "LUSERS":
 		case "MODE":
 		case "CAP":
 		case "USERHOST":
@@ -710,6 +732,8 @@ server = net.createServer(function (socket)
 });
 
 created_time = new Date();
+
+motd.rehash();
 
 server.listen(config.listen.port, config.listen.host);
 puts("ircd.js on port " + config.listen.port);

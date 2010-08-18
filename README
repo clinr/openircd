@@ -1,14 +1,28 @@
+A lightweight ircd written in javascript v8 with nodejs.
+
 $Id$
 
-1. 	How can I run this project?
-	Download javascript v8 nodejs project at http://nodejs.org/dist/node-v0.1.98.tar.gz
-	Unpack the tar ball: tar -zxvf node-v0.1.98.tar.gz
-	And run: ./configure && make && make install
-	Or if you prefer, visit http://nodejs.org/#download for more information.
-	Completing this steps, you can run ircd.js: sh$ node ircd.js
-
-2. 	What IRC Client can I use to connect to openircd ?
-	Actually IRC Clients supported: mIRC, X-Chat, KvIRC and irssi.
+Tips:
+	1. 	Building up NodeJS:
+		Download javascript v8 nodejs project at http://nodejs.org/dist/node-v0.1.98.tar.gz
+			./configure
+			make 
+			make install
+		Visit http://nodejs.org/#download for more information.
+	
+	2. 	IRC clients supported by OpenIRCd: mIRC, X-Chat, KvIRC and irssi.
+	
+	3.	Default character encoding is utf8.
+	
+	4.	Setup the config file at config.js (server name, ip binding, port and others)
+	
+	5.	Run ircd: # node ircd.js
+	
+Developers:
+	Andrei Rosseti (mdxico@gmail.com, mdx)
+	Paulo Matias (syscoder@gmail.com, thotypous)
+	
+Visit us at irc.openbrasil.org/6667.
 
 Help us coding, translating and otimizing this source project.
 

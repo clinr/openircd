@@ -52,8 +52,7 @@ function debugObj (m)
 
 function simpleString (s) 
 {
-	if (s) 
-		return s.replace(/[^\w]/, "_", "g");
+	if (s) return s.replace(/[^\w]/, "_", "g");
 }
 
 channels = {};
@@ -315,12 +314,6 @@ User.prototype.join = function (channelName)
 	}
 };
 
-User.prototype.sendPing = function ()
-{
-	this.raw("PING " + unix_timestamp());
-	debug("ping sent to: " + this.nick);
-};
-
 User.prototype.sendMotd = function () 
 {
 	if (motd.lst.length > 0) 
@@ -350,10 +343,6 @@ User.prototype.maybeRegister = function ()
 		this.sendMessage(replies.get("RPL_YOURHOST", this.nick, host, ircd_version))
 		this.sendMessage(replies.get("RPL_CREATED", this.nick, created_time.toUTCString()));
 		this.sendMessage(replies.get("RPL_MYINFO", this.nick, config.server.name, ircd_version, "iox", "ov"));
-				
-		this.ping_timer = setInterval(function (thisObj) { 
-			thisObj.sendPing();
-		}, config.general.ping_frequency * 60 * 1000, this);
 		
 		this.registered = true;	
 		
@@ -611,13 +600,16 @@ User.prototype.parse = function (message)
 				this.sendMessage(replies.get("RPL_WHOISUSER", this.nick, target.nick, 
 					target.names.user, target.vhost, target.names.real));
 					
-				this.sendMessage(replies.get("RPL_WHOISSERVER", this.nick, target.nick, target.server.name, target.server.description))
+				this.sendMessage(replies.get("RPL_WHOISSERVER", this.nick, 
+					target.nick, target.server.name, target.server.description));
 				
 				if (c.length > 0) {
-					this.sendMessage(replies.get("RPL_WHOISCHANNELS", this.nick, target.nick, c.join(" ")));
+					this.sendMessage(replies.get("RPL_WHOISCHANNELS", this.nick, 
+						target.nick, c.join(" ")));
 				}
 				
-				this.sendMessage(replies.get("RPL_WHOISIDLE", this.nick, target.nick, (unix_timestamp() - target.last_msg_time), target.signon_time))
+				this.sendMessage(replies.get("RPL_WHOISIDLE", this.nick, target.nick, 
+					(unix_timestamp() - target.last_msg_time), target.signon_time));
 					
 				this.sendMessage(replies.get("RPL_ENDOFWHOIS", this.nick, target.nick));
 			}
@@ -686,13 +678,14 @@ User.prototype.parse = function (message)
 
 server = net.createServer(function (socket) 
 {
-	socket.setTimeout(config.general.ping_frequency * 60 * 1500); 
-	socket.setEncoding("utf8");
+	socket.setTimeout(config.general.ping_timeout * 60 * 1000); 
+	socket.setEncoding("UTF8");
 	
 	var user = new User(socket);
 	var buffer = "";
 	
-	socket.addListener("connect", function () {
+	socket.addListener("connect", function () 
+	{
 		user.last_msg_time	= unix_timestamp();
 		user.signon_time	= unix_timestamp();
 		user.raw("NOTICE AUTH :*** Processing your connection ...");
@@ -706,9 +699,8 @@ server = net.createServer(function (socket)
 		
 		while (i = buffer.indexOf("\n")) 
 		{
-			if (i < 0)
-				break;
-				
+			if (i < 0) break;
+
 			var message = buffer.slice(0, i).replace(/\r$/,'');
 			
 			if (message.length > 512) {

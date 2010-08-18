@@ -20,5 +20,5 @@ exports.network = {
 };
 
 exports.general = {
-	ping_frequency: 1
+	ping_timeout: 1
 };

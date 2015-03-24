@@ -1,0 +1,1 @@
+Simple and fast IRC server written in the JavaScript language.
